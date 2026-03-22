@@ -45,7 +45,17 @@ This starts PHP-FPM, Nginx (port **8080**), and MySQL (port **3306**).
 docker compose exec api-app php artisan migrate
 ```
 
-### 3. Start the Frontend
+### 3. Create Admin User
+
+Bootstrap the first admin user to access the platform:
+
+```bash
+docker compose exec api-app php artisan user:create-admin
+```
+
+The command will prompt for first name, last name, email, and password.
+
+### 4. Start the Frontend
 
 ```bash
 docker compose --profile front up -d --build
@@ -53,7 +63,7 @@ docker compose --profile front up -d --build
 
 Vite dev server available at **http://localhost:5173**.
 
-### 4. Start Everything
+### 5. Start Everything
 
 ```bash
 docker compose --profile api --profile front up -d --build

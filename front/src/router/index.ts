@@ -1,15 +1,29 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HealthCheck from '@/views/HealthCheck.vue'
+import { useAuthStore } from '@/stores/auth'
+import authRoutes from './auth'
+import dashboardRoutes from './dashboard'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      name: 'health',
-      component: HealthCheck,
-    },
-  ],
+  routes: [...authRoutes, ...dashboardRoutes],
+})
+
+router.beforeEach((to, _from, next) => {
+  const authStore = useAuthStore()
+
+  if (to.meta.guest && authStore.isAuthenticated) {
+    return next('/dashboard')
+  }
+
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    return next('/login')
+  }
+
+  if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    return next('/dashboard')
+  }
+
+  next()
 })
 
 export default router
