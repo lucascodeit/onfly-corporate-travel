@@ -1,0 +1,19 @@
+meta {
+  name: List Notifications
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/notifications
+  body: none
+  auth: bearer
+}
+
+params:query {
+  ~filter: unread
+}
+
+auth:bearer {
+  token: {{token}}
+}

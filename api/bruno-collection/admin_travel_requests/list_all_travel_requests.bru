@@ -1,0 +1,22 @@
+meta {
+  name: List All Travel Requests
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/admin/travel-requests
+  body: none
+  auth: bearer
+}
+
+params:query {
+  ~user_id: 1
+  ~start_date: 2026-01-01
+  ~end_date: 2026-12-31
+  ~status: pending
+}
+
+auth:bearer {
+  token: {{token}}
+}

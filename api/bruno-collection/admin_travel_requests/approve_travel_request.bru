@@ -1,0 +1,15 @@
+meta {
+  name: Approve Travel Request
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{baseUrl}}/admin/travel-requests/1/approve
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

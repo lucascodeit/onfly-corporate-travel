@@ -75,11 +75,35 @@ docker compose --profile api --profile front up -d --build
 docker compose exec api-app php artisan test
 ```
 
-## API Endpoints
+## API Collection (Bruno)
 
-| Method | Endpoint        | Description                        |
-|--------|-----------------|------------------------------------|
-| GET    | `/api/healthy`  | Health check with DB & version info|
+This project includes a [Bruno](https://www.usebruno.com/) collection with ready-to-use requests for every API endpoint, located at `api/bruno-collection/`.
+
+### What is Bruno?
+
+Bruno is a free, open-source API client — an alternative to Postman and Insomnia. Collections are stored as plain-text files directly in the repository, so they stay version-controlled alongside the code.
+
+### How to use
+
+1. Download and install Bruno from [usebruno.com](https://www.usebruno.com/).
+2. Open Bruno and click **Open Collection**.
+3. Select the `api/bruno-collection/` folder.
+4. In the top-right environment dropdown, select **local**.
+5. Run the **auth/login** request first — it automatically saves the JWT token for all other requests.
+6. Browse the folders and execute any request.
+
+### Available request folders
+
+| Folder | Requests |
+|---|---|
+| `auth` | login, refresh_token, logout |
+| `profile` | get_profile, update_profile, change_password |
+| `users` | list_users, create_user, show_user, update_user, delete_user, change_user_password |
+| `travel_requests` | list_travel_requests, create_travel_request, cancel_travel_request |
+| `admin_travel_requests` | list_all_travel_requests, approve_travel_request, disapprove_travel_request |
+| `notifications` | list_notifications, unread_count, show_notification, mark_as_read |
+| `health` | health_check |
+
 
 ## Stopping Services
 
@@ -92,3 +116,19 @@ To also remove volumes (database data):
 ```bash
 docker compose --profile api --profile front down -v
 ```
+
+## Destroying everything (Docker)
+
+From the repository root, tear down **all** Compose resources for this project: containers, the `onfly-network` network, and named volumes (including **MySQL data** in `mysql-data`). This does not delete your source code on disk.
+
+```bash
+docker compose --profile api --profile front down -v --remove-orphans
+```
+
+To also remove **images built** by this Compose file (e.g. `api-app`, `front`), add `--rmi local` (only images without a custom tag) or `--rmi all` (every image used by these services):
+
+```bash
+docker compose --profile api --profile front down -v --remove-orphans --rmi local
+```
+
+**Note:** `down -v` is irreversible for database data. Use `down` without `-v` if you only want to stop containers and keep the volume.
