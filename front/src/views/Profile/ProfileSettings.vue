@@ -47,7 +47,7 @@ async function handleSubmit() {
     const axiosError = e as { response?: { data?: { errors?: Record<string, string[]> } } }
     const fieldErrors = axiosError.response?.data?.errors || {}
     for (const [key, msgs] of Object.entries(fieldErrors)) {
-      errors.value[key] = msgs[0]
+      errors.value[key] = msgs[0] || ''
     }
   } finally {
     saving.value = false

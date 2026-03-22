@@ -115,13 +115,13 @@ onMounted(() => {
               </p>
             </div>
             <div>
-              <p class="text-xs text-slate-400">Start Date</p>
+              <p class="text-xs text-slate-400">Start Travel</p>
               <p class="mt-0.5 text-sm text-slate-300">
                 {{ formatDate(store.currentNotification.travel_request.start_date) }}
               </p>
             </div>
             <div>
-              <p class="text-xs text-slate-400">End Date</p>
+              <p class="text-xs text-slate-400">End Travel</p>
               <p class="mt-0.5 text-sm text-slate-300">
                 {{ formatDate(store.currentNotification.travel_request.end_date) }}
               </p>

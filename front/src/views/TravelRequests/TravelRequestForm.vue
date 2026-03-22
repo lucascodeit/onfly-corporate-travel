@@ -61,13 +61,13 @@ async function handleSubmit() {
       <div class="grid gap-5 sm:grid-cols-2">
         <AppInput
           v-model="form.start_date"
-          label="Start Date"
+          label="Start Travel"
           type="date"
           :error="errors.start_date"
         />
         <AppInput
           v-model="form.end_date"
-          label="End Date"
+          label="End Travel"
           type="date"
           :error="errors.end_date"
         />

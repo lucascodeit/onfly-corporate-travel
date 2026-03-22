@@ -18,8 +18,8 @@ const currentPage = ref(1)
 
 const columns = [
   { key: 'destination', label: 'Destination' },
-  { key: 'start_date', label: 'Start Date' },
-  { key: 'end_date', label: 'End Date' },
+  { key: 'start_date', label: 'Start Travel' },
+  { key: 'end_date', label: 'End Travel' },
   { key: 'status', label: 'Status' },
   { key: 'admin', label: 'Reviewed By' },
   { key: 'created_at', label: 'Created At' },
@@ -97,7 +97,7 @@ onMounted(() => store.fetchRequests())
         </select>
       </div>
       <div>
-        <label for="filter-start-date" class="mb-1 block text-sm text-slate-300">Start date</label>
+        <label for="filter-start-date" class="mb-1 block text-sm text-slate-300">Start travel</label>
         <input
           id="filter-start-date"
           v-model="filterStartDate"
@@ -107,7 +107,7 @@ onMounted(() => store.fetchRequests())
         />
       </div>
       <div>
-        <label for="filter-end-date" class="mb-1 block text-sm text-slate-300">End date</label>
+        <label for="filter-end-date" class="mb-1 block text-sm text-slate-300">End travel</label>
         <input
           id="filter-end-date"
           v-model="filterEndDate"
