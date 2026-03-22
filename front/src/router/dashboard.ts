@@ -2,6 +2,7 @@ import type { RouteRecordRaw } from 'vue-router'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import travelRequestRoutes from './travelRequests'
 import adminTravelRequestRoutes from './adminTravelRequests'
+import notificationRoutes from './notifications'
 
 const dashboardRoutes: RouteRecordRaw[] = [
   {
@@ -44,6 +45,7 @@ const dashboardRoutes: RouteRecordRaw[] = [
       },
       ...travelRequestRoutes,
       ...adminTravelRequestRoutes,
+      ...notificationRoutes,
       {
         path: 'profile',
         name: 'profile',

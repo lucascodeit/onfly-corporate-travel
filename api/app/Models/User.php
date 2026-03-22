@@ -54,4 +54,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(TravelRequest::class);
     }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class, 'user_to_id');
+    }
 }

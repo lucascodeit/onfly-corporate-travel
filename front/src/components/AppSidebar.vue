@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useNotificationStore } from '@/stores/notifications'
 
 const authStore = useAuthStore()
+const notificationStore = useNotificationStore()
 const route = useRoute()
 const collapsed = ref(false)
 const userMenuOpen = ref(false)
+
+onMounted(() => {
+  notificationStore.fetchUnreadCount()
+})
 
 function toggleSidebar() {
   collapsed.value = !collapsed.value
@@ -89,6 +95,25 @@ async function handleLogout() {
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
         </svg>
         <span v-if="!collapsed">My Travel Requests</span>
+      </RouterLink>
+
+      <RouterLink
+        to="/notifications"
+        class="relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition"
+        :class="isActive('/notifications') ? 'bg-indigo-600/20 text-indigo-400' : 'text-slate-300 hover:bg-slate-800 hover:text-white'"
+      >
+        <div class="relative shrink-0">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+          </svg>
+          <span
+            v-if="notificationStore.unreadCount > 0"
+            class="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white"
+          >
+            {{ notificationStore.unreadCount > 99 ? '99+' : notificationStore.unreadCount }}
+          </span>
+        </div>
+        <span v-if="!collapsed">Notifications</span>
       </RouterLink>
     </nav>
 

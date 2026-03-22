@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\AdminTravelRequestController;
 use App\Http\Controllers\Api\TravelRequestController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -41,5 +42,12 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/', [TravelRequestController::class, 'index']);
         Route::post('/', [TravelRequestController::class, 'store']);
         Route::patch('/{travelRequest}/cancel', [TravelRequestController::class, 'cancel']);
+    });
+
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', [NotificationController::class, 'index']);
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::get('/{notification}', [NotificationController::class, 'show']);
+        Route::patch('/{notification}/read', [NotificationController::class, 'markAsRead']);
     });
 });

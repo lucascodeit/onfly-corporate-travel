@@ -10,6 +10,8 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class TravelRequestService
 {
+    public function __construct(private readonly NotificationService $notificationService) {}
+
     public function listForUser(User $user): LengthAwarePaginator
     {
         return TravelRequest::query()
@@ -45,7 +47,11 @@ class TravelRequestService
 
         $travelRequest->update(['status' => 'approved', 'admin_id' => $admin->id]);
 
-        return $travelRequest->fresh();
+        $travelRequest = $travelRequest->fresh();
+
+        $this->notificationService->createForStatusChange($admin, $travelRequest);
+
+        return $travelRequest;
     }
 
     public function disapprove(User $admin, TravelRequest $travelRequest): TravelRequest
@@ -56,7 +62,11 @@ class TravelRequestService
 
         $travelRequest->update(['status' => 'disapproved', 'admin_id' => $admin->id]);
 
-        return $travelRequest->fresh();
+        $travelRequest = $travelRequest->fresh();
+
+        $this->notificationService->createForStatusChange($admin, $travelRequest);
+
+        return $travelRequest;
     }
 
     public function cancel(User $user, TravelRequest $travelRequest): TravelRequest
