@@ -5,7 +5,7 @@ import {
   cancelTravelRequest,
   type TravelRequest,
   type StoreTravelRequestPayload,
-  type DateRangeFilter,
+  type TravelRequestFilters,
 } from '@/services/travelRequests'
 
 interface TravelRequestState {
@@ -26,7 +26,7 @@ export const useTravelRequestStore = defineStore('travelRequests', {
   }),
 
   actions: {
-    async fetchRequests(page = 1, filters?: DateRangeFilter) {
+    async fetchRequests(page = 1, filters?: TravelRequestFilters) {
       this.loading = true
       try {
         const { data } = await getTravelRequests(page, filters)

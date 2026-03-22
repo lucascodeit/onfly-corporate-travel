@@ -4,7 +4,7 @@ import {
   approveTravelRequest,
   disapproveTravelRequest,
   type TravelRequest,
-  type DateRangeFilter,
+  type TravelRequestFilters,
 } from '@/services/travelRequests'
 
 interface AdminTravelRequestState {
@@ -25,7 +25,7 @@ export const useAdminTravelRequestStore = defineStore('adminTravelRequests', {
   }),
 
   actions: {
-    async fetchRequests(page = 1, userId?: number, filters?: DateRangeFilter) {
+    async fetchRequests(page = 1, userId?: number, filters?: TravelRequestFilters) {
       this.loading = true
       try {
         const { data } = await getAdminTravelRequests(page, userId, filters)

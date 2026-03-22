@@ -23,6 +23,7 @@ class TravelRequestController extends Controller
                 Auth::user(),
                 $request->query('start_date'),
                 $request->query('end_date'),
+                $request->query('status'),
             )
         );
     }

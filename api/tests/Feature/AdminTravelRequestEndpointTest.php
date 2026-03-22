@@ -233,4 +233,38 @@ class AdminTravelRequestEndpointTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonCount(1, 'data');
     }
+
+    public function test_admin_can_filter_travel_requests_by_status(): void
+    {
+        $admin = $this->actingAsAdmin();
+
+        $staff = User::factory()->create();
+        TravelRequest::factory()->for($staff)->create(['status' => 'requested']);
+        TravelRequest::factory()->for($staff)->create(['status' => 'requested']);
+        TravelRequest::factory()->for($staff)->create(['status' => 'approved', 'admin_id' => $admin->id]);
+        TravelRequest::factory()->for($staff)->create(['status' => 'disapproved', 'admin_id' => $admin->id]);
+        TravelRequest::factory()->for($staff)->create(['status' => 'cancelled']);
+
+        $response = $this->getJson('/api/admin/travel-requests?status=approved');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'data');
+    }
+
+    public function test_admin_can_combine_status_user_and_date_filters(): void
+    {
+        $admin = $this->actingAsAdmin();
+
+        $staffA = User::factory()->create();
+        $staffB = User::factory()->create();
+
+        TravelRequest::factory()->for($staffA)->create(['status' => 'approved', 'admin_id' => $admin->id, 'start_date' => '2026-02-10', 'end_date' => '2026-02-20']);
+        TravelRequest::factory()->for($staffA)->create(['status' => 'requested', 'start_date' => '2026-02-15', 'end_date' => '2026-02-25']);
+        TravelRequest::factory()->for($staffB)->create(['status' => 'approved', 'admin_id' => $admin->id, 'start_date' => '2026-02-12', 'end_date' => '2026-02-18']);
+
+        $response = $this->getJson("/api/admin/travel-requests?user_id={$staffA->id}&status=approved&start_date=2026-02-01&end_date=2026-02-28");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'data');
+    }
 }

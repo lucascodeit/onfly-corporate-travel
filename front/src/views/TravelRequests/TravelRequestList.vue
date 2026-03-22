@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTravelRequestStore } from '@/stores/travelRequests'
-import type { TravelRequest, DateRangeFilter } from '@/services/travelRequests'
+import type { TravelRequest, TravelRequestFilters } from '@/services/travelRequests'
 import AppButton from '@/components/AppButton.vue'
 import AppTable from '@/components/AppTable.vue'
 import CancelTravelRequestModal from './components/CancelTravelRequestModal.vue'
@@ -13,6 +13,7 @@ const cancelTarget = ref<TravelRequest | null>(null)
 
 const filterStartDate = ref('')
 const filterEndDate = ref('')
+const filterStatus = ref('')
 const currentPage = ref(1)
 
 const columns = [
@@ -31,28 +32,29 @@ const statusConfig: Record<string, { class: string; label: string }> = {
   cancelled: { class: 'bg-slate-500/15 text-slate-400', label: 'Cancelled' },
 }
 
-const dateFilters = computed<DateRangeFilter>(() => {
-  const filters: DateRangeFilter = {}
+const activeFilters = computed<TravelRequestFilters>(() => {
+  const filters: TravelRequestFilters = {}
   if (filterStartDate.value) filters.start_date = filterStartDate.value
   if (filterEndDate.value) filters.end_date = filterEndDate.value
+  if (filterStatus.value) filters.status = filterStatus.value
   return filters
 })
 
 async function handleFilterChange() {
   currentPage.value = 1
-  await store.fetchRequests(1, dateFilters.value)
+  await store.fetchRequests(1, activeFilters.value)
 }
 
 async function handleCancel() {
   if (!cancelTarget.value) return
   await store.cancel(cancelTarget.value.id)
   cancelTarget.value = null
-  await store.fetchRequests(currentPage.value, dateFilters.value)
+  await store.fetchRequests(currentPage.value, activeFilters.value)
 }
 
 async function goToPage(page: number) {
   currentPage.value = page
-  await store.fetchRequests(page, dateFilters.value)
+  await store.fetchRequests(page, activeFilters.value)
 }
 
 function formatDate(dateStr: string) {
@@ -79,6 +81,21 @@ onMounted(() => store.fetchRequests())
     </div>
 
     <div class="mb-4 flex flex-wrap items-end gap-4">
+      <div>
+        <label for="filter-status" class="mb-1 block text-sm text-slate-300">Status</label>
+        <select
+          id="filter-status"
+          v-model="filterStatus"
+          class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none"
+          @change="handleFilterChange"
+        >
+          <option value="">All statuses</option>
+          <option value="requested">Requested</option>
+          <option value="approved">Approved</option>
+          <option value="disapproved">Disapproved</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
       <div>
         <label for="filter-start-date" class="mb-1 block text-sm text-slate-300">Start date</label>
         <input

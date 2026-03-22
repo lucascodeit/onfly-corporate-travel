@@ -10,11 +10,11 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <div class="overflow-hidden rounded-xl border border-slate-700 bg-slate-800/60">
+  <div class="overflow-x-auto rounded-xl border border-slate-700 bg-slate-800/60">
     <div v-if="loading" class="flex justify-center p-8">
       <div class="h-8 w-8 animate-spin rounded-full border-4 border-slate-600 border-t-indigo-400" />
     </div>
-    <table v-else class="w-full text-left text-sm">
+    <table v-else class="min-w-full whitespace-nowrap text-left text-sm">
       <thead class="border-b border-slate-700 bg-slate-800">
         <tr>
           <th

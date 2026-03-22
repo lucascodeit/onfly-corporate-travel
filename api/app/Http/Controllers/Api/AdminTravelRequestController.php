@@ -21,6 +21,7 @@ class AdminTravelRequestController extends Controller
                 $request->query('user_id'),
                 $request->query('start_date'),
                 $request->query('end_date'),
+                $request->query('status'),
             )
         );
     }

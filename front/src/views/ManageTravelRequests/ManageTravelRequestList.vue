@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAdminTravelRequestStore } from '@/stores/adminTravelRequests'
 import { getUsers, type User } from '@/services/users'
-import type { TravelRequest, DateRangeFilter } from '@/services/travelRequests'
+import type { TravelRequest, TravelRequestFilters } from '@/services/travelRequests'
 import AppButton from '@/components/AppButton.vue'
 import AppTable from '@/components/AppTable.vue'
 import ReviewTravelRequestModal from './components/ReviewTravelRequestModal.vue'
@@ -13,6 +13,7 @@ const users = ref<User[]>([])
 const selectedUserId = ref<number | undefined>(undefined)
 const filterStartDate = ref('')
 const filterEndDate = ref('')
+const filterStatus = ref('')
 const currentPage = ref(1)
 
 const reviewTarget = ref<TravelRequest | null>(null)
@@ -35,10 +36,11 @@ const statusConfig: Record<string, { class: string; label: string }> = {
   cancelled: { class: 'bg-slate-500/15 text-slate-400', label: 'Cancelled' },
 }
 
-const dateFilters = computed<DateRangeFilter>(() => {
-  const filters: DateRangeFilter = {}
+const activeFilters = computed<TravelRequestFilters>(() => {
+  const filters: TravelRequestFilters = {}
   if (filterStartDate.value) filters.start_date = filterStartDate.value
   if (filterEndDate.value) filters.end_date = filterEndDate.value
+  if (filterStatus.value) filters.status = filterStatus.value
   return filters
 })
 
@@ -59,17 +61,17 @@ async function handleConfirm() {
   }
 
   reviewTarget.value = null
-  await store.fetchRequests(currentPage.value, selectedUserId.value, dateFilters.value)
+  await store.fetchRequests(currentPage.value, selectedUserId.value, activeFilters.value)
 }
 
 async function handleFilterChange() {
   currentPage.value = 1
-  await store.fetchRequests(1, selectedUserId.value, dateFilters.value)
+  await store.fetchRequests(1, selectedUserId.value, activeFilters.value)
 }
 
 async function goToPage(page: number) {
   currentPage.value = page
-  await store.fetchRequests(page, selectedUserId.value, dateFilters.value)
+  await store.fetchRequests(page, selectedUserId.value, activeFilters.value)
 }
 
 function formatDate(dateStr: string) {
@@ -114,6 +116,21 @@ onMounted(async () => {
           <option v-for="user in users" :key="user.id" :value="user.id">
             {{ user.first_name }} {{ user.last_name }}
           </option>
+        </select>
+      </div>
+      <div>
+        <label for="filter-status" class="mb-1 block text-sm text-slate-300">Status</label>
+        <select
+          id="filter-status"
+          v-model="filterStatus"
+          class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none"
+          @change="handleFilterChange"
+        >
+          <option value="">All statuses</option>
+          <option value="requested">Requested</option>
+          <option value="approved">Approved</option>
+          <option value="disapproved">Disapproved</option>
+          <option value="cancelled">Cancelled</option>
         </select>
       </div>
       <div>
