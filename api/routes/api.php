@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\AdminTravelRequestController;
 use App\Http\Controllers\Api\TravelRequestController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
@@ -28,6 +29,12 @@ Route::middleware('auth:api')->group(function () {
     Route::middleware('admin')->group(function () {
         Route::apiResource('users', UserController::class);
         Route::put('/users/{user}/password', [UserController::class, 'changePassword']);
+
+        Route::prefix('admin/travel-requests')->group(function () {
+            Route::get('/', [AdminTravelRequestController::class, 'index']);
+            Route::patch('/{travelRequest}/approve', [AdminTravelRequestController::class, 'approve']);
+            Route::patch('/{travelRequest}/disapprove', [AdminTravelRequestController::class, 'disapprove']);
+        });
     });
 
     Route::middleware('staff')->prefix('travel-requests')->group(function () {

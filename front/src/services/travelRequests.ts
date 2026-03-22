@@ -32,3 +32,18 @@ export function createTravelRequest(payload: StoreTravelRequestPayload) {
 export function cancelTravelRequest(id: number) {
   return apiClient.patch<{ data: TravelRequest }>(`/travel-requests/${id}/cancel`)
 }
+
+export function getAdminTravelRequests(page = 1, userId?: number) {
+  return apiClient.get<{ data: TravelRequest[]; meta: Record<string, unknown> }>(
+    '/admin/travel-requests',
+    { params: { page, user_id: userId } },
+  )
+}
+
+export function approveTravelRequest(id: number) {
+  return apiClient.patch<{ data: TravelRequest }>(`/admin/travel-requests/${id}/approve`)
+}
+
+export function disapproveTravelRequest(id: number) {
+  return apiClient.patch<{ data: TravelRequest }>(`/admin/travel-requests/${id}/disapprove`)
+}

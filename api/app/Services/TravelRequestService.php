@@ -28,6 +28,37 @@ class TravelRequestService
         ]);
     }
 
+    public function listAll(?int $userId = null): LengthAwarePaginator
+    {
+        return TravelRequest::query()
+            ->when($userId, fn ($q) => $q->where('user_id', $userId))
+            ->with(['user', 'admin'])
+            ->latest()
+            ->paginate();
+    }
+
+    public function approve(User $admin, TravelRequest $travelRequest): TravelRequest
+    {
+        if ($travelRequest->status === 'cancelled') {
+            throw new UnprocessableEntityHttpException('Cancelled requests cannot be approved.');
+        }
+
+        $travelRequest->update(['status' => 'approved', 'admin_id' => $admin->id]);
+
+        return $travelRequest->fresh();
+    }
+
+    public function disapprove(User $admin, TravelRequest $travelRequest): TravelRequest
+    {
+        if ($travelRequest->status === 'cancelled') {
+            throw new UnprocessableEntityHttpException('Cancelled requests cannot be disapproved.');
+        }
+
+        $travelRequest->update(['status' => 'disapproved', 'admin_id' => $admin->id]);
+
+        return $travelRequest->fresh();
+    }
+
     public function cancel(User $user, TravelRequest $travelRequest): TravelRequest
     {
         if ($travelRequest->user_id !== $user->id) {
