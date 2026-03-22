@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\TravelRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -146,7 +147,19 @@ class UserEndpointTest extends TestCase
         $response = $this->deleteJson("/api/users/{$user->id}");
 
         $response->assertStatus(200);
-        $this->assertDatabaseMissing('users', ['id' => $user->id]);
+        $this->assertSoftDeleted('users', ['id' => $user->id]);
+    }
+
+    public function test_admin_cannot_delete_user_with_travel_requests(): void
+    {
+        $this->actingAsAdmin();
+        $user = User::factory()->create();
+        TravelRequest::factory()->for($user)->create();
+
+        $response = $this->deleteJson("/api/users/{$user->id}");
+
+        $response->assertStatus(409);
+        $this->assertDatabaseHas('users', ['id' => $user->id, 'deleted_at' => null]);
     }
 
     public function test_admin_can_change_user_password(): void

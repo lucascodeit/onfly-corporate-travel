@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class UserService
 {
@@ -36,6 +37,11 @@ class UserService
     public function delete(int $id): void
     {
         $user = User::findOrFail($id);
+
+        if ($user->travelRequests()->exists()) {
+            throw new ConflictHttpException('Cannot delete user with travel requests.');
+        }
+
         $user->delete();
     }
 

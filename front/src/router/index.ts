@@ -23,6 +23,10 @@ router.beforeEach((to, _from, next) => {
     return next('/dashboard')
   }
 
+  if (to.meta.requiresStaff && authStore.isAdmin) {
+    return next('/dashboard')
+  }
+
   next()
 })
 

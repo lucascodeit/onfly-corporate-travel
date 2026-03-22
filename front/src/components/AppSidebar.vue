@@ -66,6 +66,18 @@ async function handleLogout() {
         </svg>
         <span v-if="!collapsed">Users</span>
       </RouterLink>
+
+      <RouterLink
+        v-if="!authStore.isAdmin"
+        to="/travel-requests"
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition"
+        :class="isActive('/travel-requests') ? 'bg-indigo-600/20 text-indigo-400' : 'text-slate-300 hover:bg-slate-800 hover:text-white'"
+      >
+        <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+        </svg>
+        <span v-if="!collapsed">My Travel Requests</span>
+      </RouterLink>
     </nav>
 
     <!-- User Section -->

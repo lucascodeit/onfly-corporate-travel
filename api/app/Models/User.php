@@ -4,13 +4,15 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'first_name',
@@ -46,5 +48,10 @@ class User extends Authenticatable implements JWTSubject
     public function isAdmin(): bool
     {
         return $this->type === 'admin';
+    }
+
+    public function travelRequests(): HasMany
+    {
+        return $this->hasMany(TravelRequest::class);
     }
 }

@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
+import travelRequestRoutes from './travelRequests'
 
 const dashboardRoutes: RouteRecordRaw[] = [
   {
@@ -40,6 +41,7 @@ const dashboardRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/Users/UserPassword.vue'),
         meta: { requiresAdmin: true },
       },
+      ...travelRequestRoutes,
       {
         path: 'profile',
         name: 'profile',
