@@ -171,4 +171,66 @@ class AdminTravelRequestEndpointTest extends TestCase
 
         $response->assertStatus(422);
     }
+
+    public function test_admin_can_filter_travel_requests_by_start_date(): void
+    {
+        $this->actingAsAdmin();
+
+        $staff = User::factory()->create();
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-01-10', 'end_date' => '2026-01-15']);
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-02-10', 'end_date' => '2026-02-20']);
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-03-05', 'end_date' => '2026-03-15']);
+
+        $response = $this->getJson('/api/admin/travel-requests?start_date=2026-02-01');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data');
+    }
+
+    public function test_admin_can_filter_travel_requests_by_end_date(): void
+    {
+        $this->actingAsAdmin();
+
+        $staff = User::factory()->create();
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-01-10', 'end_date' => '2026-01-15']);
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-02-10', 'end_date' => '2026-02-20']);
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-03-05', 'end_date' => '2026-03-15']);
+
+        $response = $this->getJson('/api/admin/travel-requests?end_date=2026-02-15');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data');
+    }
+
+    public function test_admin_can_filter_travel_requests_by_date_range(): void
+    {
+        $this->actingAsAdmin();
+
+        $staff = User::factory()->create();
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-01-10', 'end_date' => '2026-01-15']);
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-02-10', 'end_date' => '2026-02-20']);
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-03-05', 'end_date' => '2026-03-15']);
+
+        $response = $this->getJson('/api/admin/travel-requests?start_date=2026-02-01&end_date=2026-02-28');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'data');
+    }
+
+    public function test_admin_can_combine_user_and_date_filters(): void
+    {
+        $this->actingAsAdmin();
+
+        $staffA = User::factory()->create();
+        $staffB = User::factory()->create();
+
+        TravelRequest::factory()->for($staffA)->create(['start_date' => '2026-02-10', 'end_date' => '2026-02-20']);
+        TravelRequest::factory()->for($staffA)->create(['start_date' => '2026-03-05', 'end_date' => '2026-03-15']);
+        TravelRequest::factory()->for($staffB)->create(['start_date' => '2026-02-12', 'end_date' => '2026-02-18']);
+
+        $response = $this->getJson("/api/admin/travel-requests?user_id={$staffA->id}&start_date=2026-02-01&end_date=2026-02-28");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'data');
+    }
 }

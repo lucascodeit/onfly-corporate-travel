@@ -207,4 +207,46 @@ class TravelRequestEndpointTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonStructure(['data', 'links', 'meta']);
     }
+
+    public function test_staff_can_filter_travel_requests_by_start_date(): void
+    {
+        $staff = $this->actingAsStaff();
+
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-01-10', 'end_date' => '2026-01-15']);
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-02-10', 'end_date' => '2026-02-20']);
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-03-05', 'end_date' => '2026-03-15']);
+
+        $response = $this->getJson('/api/travel-requests?start_date=2026-02-01');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data');
+    }
+
+    public function test_staff_can_filter_travel_requests_by_end_date(): void
+    {
+        $staff = $this->actingAsStaff();
+
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-01-10', 'end_date' => '2026-01-15']);
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-02-10', 'end_date' => '2026-02-20']);
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-03-05', 'end_date' => '2026-03-15']);
+
+        $response = $this->getJson('/api/travel-requests?end_date=2026-02-15');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data');
+    }
+
+    public function test_staff_can_filter_travel_requests_by_date_range(): void
+    {
+        $staff = $this->actingAsStaff();
+
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-01-10', 'end_date' => '2026-01-15']);
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-02-10', 'end_date' => '2026-02-20']);
+        TravelRequest::factory()->for($staff)->create(['start_date' => '2026-03-05', 'end_date' => '2026-03-15']);
+
+        $response = $this->getJson('/api/travel-requests?start_date=2026-02-01&end_date=2026-02-28');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'data');
+    }
 }

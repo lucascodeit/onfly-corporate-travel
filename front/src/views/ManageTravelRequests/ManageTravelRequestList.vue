@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAdminTravelRequestStore } from '@/stores/adminTravelRequests'
 import { getUsers, type User } from '@/services/users'
-import type { TravelRequest } from '@/services/travelRequests'
+import type { TravelRequest, DateRangeFilter } from '@/services/travelRequests'
 import AppButton from '@/components/AppButton.vue'
 import AppTable from '@/components/AppTable.vue'
 import ReviewTravelRequestModal from './components/ReviewTravelRequestModal.vue'
@@ -11,6 +11,8 @@ const store = useAdminTravelRequestStore()
 
 const users = ref<User[]>([])
 const selectedUserId = ref<number | undefined>(undefined)
+const filterStartDate = ref('')
+const filterEndDate = ref('')
 const currentPage = ref(1)
 
 const reviewTarget = ref<TravelRequest | null>(null)
@@ -33,6 +35,13 @@ const statusConfig: Record<string, { class: string; label: string }> = {
   cancelled: { class: 'bg-slate-500/15 text-slate-400', label: 'Cancelled' },
 }
 
+const dateFilters = computed<DateRangeFilter>(() => {
+  const filters: DateRangeFilter = {}
+  if (filterStartDate.value) filters.start_date = filterStartDate.value
+  if (filterEndDate.value) filters.end_date = filterEndDate.value
+  return filters
+})
+
 function openReviewModal(request: TravelRequest, action: 'approve' | 'disapprove') {
   reviewTarget.value = request
   reviewAction.value = action
@@ -50,17 +59,17 @@ async function handleConfirm() {
   }
 
   reviewTarget.value = null
-  await store.fetchRequests(currentPage.value, selectedUserId.value)
+  await store.fetchRequests(currentPage.value, selectedUserId.value, dateFilters.value)
 }
 
 async function handleFilterChange() {
   currentPage.value = 1
-  await store.fetchRequests(1, selectedUserId.value)
+  await store.fetchRequests(1, selectedUserId.value, dateFilters.value)
 }
 
 async function goToPage(page: number) {
   currentPage.value = page
-  await store.fetchRequests(page, selectedUserId.value)
+  await store.fetchRequests(page, selectedUserId.value, dateFilters.value)
 }
 
 function formatDate(dateStr: string) {
@@ -92,19 +101,41 @@ onMounted(async () => {
       <h1 class="text-2xl font-bold text-white">Manage Travel Requests</h1>
     </div>
 
-    <div class="mb-4">
-      <label for="user-filter" class="mr-2 text-sm text-slate-300">Filter by user:</label>
-      <select
-        id="user-filter"
-        v-model="selectedUserId"
-        class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none"
-        @change="handleFilterChange"
-      >
-        <option :value="undefined">All users</option>
-        <option v-for="user in users" :key="user.id" :value="user.id">
-          {{ user.first_name }} {{ user.last_name }}
-        </option>
-      </select>
+    <div class="mb-4 flex flex-wrap items-end gap-4">
+      <div>
+        <label for="user-filter" class="mb-1 block text-sm text-slate-300">Filter by user</label>
+        <select
+          id="user-filter"
+          v-model="selectedUserId"
+          class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none"
+          @change="handleFilterChange"
+        >
+          <option :value="undefined">All users</option>
+          <option v-for="user in users" :key="user.id" :value="user.id">
+            {{ user.first_name }} {{ user.last_name }}
+          </option>
+        </select>
+      </div>
+      <div>
+        <label for="filter-start-date" class="mb-1 block text-sm text-slate-300">Start date</label>
+        <input
+          id="filter-start-date"
+          v-model="filterStartDate"
+          type="date"
+          class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none"
+          @change="handleFilterChange"
+        />
+      </div>
+      <div>
+        <label for="filter-end-date" class="mb-1 block text-sm text-slate-300">End date</label>
+        <input
+          id="filter-end-date"
+          v-model="filterEndDate"
+          type="date"
+          class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none"
+          @change="handleFilterChange"
+        />
+      </div>
     </div>
 
     <AppTable :columns="columns" :loading="store.loading">

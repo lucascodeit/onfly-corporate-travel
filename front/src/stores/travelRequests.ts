@@ -5,6 +5,7 @@ import {
   cancelTravelRequest,
   type TravelRequest,
   type StoreTravelRequestPayload,
+  type DateRangeFilter,
 } from '@/services/travelRequests'
 
 interface TravelRequestState {
@@ -25,10 +26,10 @@ export const useTravelRequestStore = defineStore('travelRequests', {
   }),
 
   actions: {
-    async fetchRequests(page = 1) {
+    async fetchRequests(page = 1, filters?: DateRangeFilter) {
       this.loading = true
       try {
-        const { data } = await getTravelRequests(page)
+        const { data } = await getTravelRequests(page, filters)
         this.requests = data.data
         this.meta = data.meta
       } finally {

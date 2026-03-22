@@ -9,15 +9,22 @@ use App\Http\Resources\TravelRequestResource;
 use App\Models\TravelRequest;
 use App\Services\TravelRequestService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TravelRequestController extends Controller
 {
     public function __construct(private readonly TravelRequestService $travelRequestService) {}
 
-    public function index(): TravelRequestCollection
+    public function index(Request $request): TravelRequestCollection
     {
-        return new TravelRequestCollection($this->travelRequestService->listForUser(Auth::user()));
+        return new TravelRequestCollection(
+            $this->travelRequestService->listForUser(
+                Auth::user(),
+                $request->query('start_date'),
+                $request->query('end_date'),
+            )
+        );
     }
 
     public function store(StoreTravelRequestRequest $request): JsonResponse

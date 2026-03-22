@@ -18,10 +18,15 @@ export interface StoreTravelRequestPayload {
   end_date: string
 }
 
-export function getTravelRequests(page = 1) {
+export interface DateRangeFilter {
+  start_date?: string
+  end_date?: string
+}
+
+export function getTravelRequests(page = 1, filters?: DateRangeFilter) {
   return apiClient.get<{ data: TravelRequest[]; meta: Record<string, unknown> }>(
     '/travel-requests',
-    { params: { page } },
+    { params: { page, ...filters } },
   )
 }
 
@@ -33,10 +38,10 @@ export function cancelTravelRequest(id: number) {
   return apiClient.patch<{ data: TravelRequest }>(`/travel-requests/${id}/cancel`)
 }
 
-export function getAdminTravelRequests(page = 1, userId?: number) {
+export function getAdminTravelRequests(page = 1, userId?: number, filters?: DateRangeFilter) {
   return apiClient.get<{ data: TravelRequest[]; meta: Record<string, unknown> }>(
     '/admin/travel-requests',
-    { params: { page, user_id: userId } },
+    { params: { page, user_id: userId, ...filters } },
   )
 }
 

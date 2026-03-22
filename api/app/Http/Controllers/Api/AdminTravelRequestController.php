@@ -17,7 +17,11 @@ class AdminTravelRequestController extends Controller
     public function index(Request $request): TravelRequestCollection
     {
         return new TravelRequestCollection(
-            $this->travelRequestService->listAll($request->query('user_id'))
+            $this->travelRequestService->listAll(
+                $request->query('user_id'),
+                $request->query('start_date'),
+                $request->query('end_date'),
+            )
         );
     }
 

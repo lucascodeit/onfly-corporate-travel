@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTravelRequestStore } from '@/stores/travelRequests'
-import type { TravelRequest } from '@/services/travelRequests'
+import type { TravelRequest, DateRangeFilter } from '@/services/travelRequests'
 import AppButton from '@/components/AppButton.vue'
 import AppTable from '@/components/AppTable.vue'
 import CancelTravelRequestModal from './components/CancelTravelRequestModal.vue'
@@ -10,6 +10,10 @@ import CancelTravelRequestModal from './components/CancelTravelRequestModal.vue'
 const router = useRouter()
 const store = useTravelRequestStore()
 const cancelTarget = ref<TravelRequest | null>(null)
+
+const filterStartDate = ref('')
+const filterEndDate = ref('')
+const currentPage = ref(1)
 
 const columns = [
   { key: 'destination', label: 'Destination' },
@@ -27,18 +31,28 @@ const statusConfig: Record<string, { class: string; label: string }> = {
   cancelled: { class: 'bg-slate-500/15 text-slate-400', label: 'Cancelled' },
 }
 
+const dateFilters = computed<DateRangeFilter>(() => {
+  const filters: DateRangeFilter = {}
+  if (filterStartDate.value) filters.start_date = filterStartDate.value
+  if (filterEndDate.value) filters.end_date = filterEndDate.value
+  return filters
+})
+
+async function handleFilterChange() {
+  currentPage.value = 1
+  await store.fetchRequests(1, dateFilters.value)
+}
+
 async function handleCancel() {
   if (!cancelTarget.value) return
   await store.cancel(cancelTarget.value.id)
   cancelTarget.value = null
-  await store.fetchRequests(currentPage.value)
+  await store.fetchRequests(currentPage.value, dateFilters.value)
 }
-
-const currentPage = ref(1)
 
 async function goToPage(page: number) {
   currentPage.value = page
-  await store.fetchRequests(page)
+  await store.fetchRequests(page, dateFilters.value)
 }
 
 function formatDate(dateStr: string) {
@@ -62,6 +76,29 @@ onMounted(() => store.fetchRequests())
         </svg>
         New Request
       </AppButton>
+    </div>
+
+    <div class="mb-4 flex flex-wrap items-end gap-4">
+      <div>
+        <label for="filter-start-date" class="mb-1 block text-sm text-slate-300">Start date</label>
+        <input
+          id="filter-start-date"
+          v-model="filterStartDate"
+          type="date"
+          class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none"
+          @change="handleFilterChange"
+        />
+      </div>
+      <div>
+        <label for="filter-end-date" class="mb-1 block text-sm text-slate-300">End date</label>
+        <input
+          id="filter-end-date"
+          v-model="filterEndDate"
+          type="date"
+          class="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none"
+          @change="handleFilterChange"
+        />
+      </div>
     </div>
 
     <AppTable :columns="columns" :loading="store.loading">

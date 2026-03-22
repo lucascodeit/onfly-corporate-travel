@@ -12,10 +12,12 @@ class TravelRequestService
 {
     public function __construct(private readonly NotificationService $notificationService) {}
 
-    public function listForUser(User $user): LengthAwarePaginator
+    public function listForUser(User $user, ?string $startDate = null, ?string $endDate = null): LengthAwarePaginator
     {
         return TravelRequest::query()
             ->where('user_id', $user->id)
+            ->when($startDate, fn ($q, $d) => $q->where('end_date', '>=', $d))
+            ->when($endDate, fn ($q, $d) => $q->where('start_date', '<=', $d))
             ->with('admin')
             ->latest()
             ->paginate();
@@ -30,10 +32,12 @@ class TravelRequestService
         ]);
     }
 
-    public function listAll(?int $userId = null): LengthAwarePaginator
+    public function listAll(?int $userId = null, ?string $startDate = null, ?string $endDate = null): LengthAwarePaginator
     {
         return TravelRequest::query()
             ->when($userId, fn ($q) => $q->where('user_id', $userId))
+            ->when($startDate, fn ($q, $d) => $q->where('end_date', '>=', $d))
+            ->when($endDate, fn ($q, $d) => $q->where('start_date', '<=', $d))
             ->with(['user', 'admin'])
             ->latest()
             ->paginate();
