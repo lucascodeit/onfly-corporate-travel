@@ -39,13 +39,23 @@ docker compose --profile api up -d --build
 
 This starts PHP-FPM, Nginx (port **8080**), and MySQL (port **3306**).
 
-### 2. Run Migrations
+### 2. Generate JWT Secret
+
+Generate the secret key used to sign authentication tokens:
+
+```bash
+docker compose exec api-app php artisan jwt:secret
+```
+
+This writes a random `JWT_SECRET` value into `api/.env`.
+
+### 3. Run Migrations
 
 ```bash
 docker compose exec api-app php artisan migrate
 ```
 
-### 3. Create Admin User
+### 4. Create Admin User
 
 Bootstrap the first admin user to access the platform:
 
@@ -55,7 +65,7 @@ docker compose exec api-app php artisan user:create-admin
 
 The command will prompt for first name, last name, email, and password.
 
-### 4. Start the Frontend
+### 5. Start the Frontend
 
 ```bash
 docker compose --profile front up -d --build
@@ -63,7 +73,7 @@ docker compose --profile front up -d --build
 
 Vite dev server available at **http://localhost:5173**.
 
-### 5. Start Everything
+### 6. Start Everything
 
 ```bash
 docker compose --profile api --profile front up -d --build
